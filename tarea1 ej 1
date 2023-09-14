@@ -11,21 +11,35 @@ movimientos = {
     9: [2, 4]
 }
 
+# Usaremos memoización para almacenar los resultados calculados
+memo = {}
 
-def calcular(inicio, pasos):
+
+def calcular(inicio, pasos, n):
+    # Verificar si ya calculamos esto antes
+    if (inicio, pasos, n) in memo:
+        return memo[(inicio, pasos, n)]
+
     movs = 0
-    if pasos:
+    if pasos == 0:
+        return 1
+    if n > 0:
         for siguiente in movimientos[inicio]:
-            print(f"{pasos}: {inicio} -> {siguiente}")
-            movs += 1 + calcular(siguiente, pasos - 1)
+            movs += calcular(siguiente, pasos - 1, n - 1)
+
+    # Almacenar el resultado calculado en la memoización
+    memo[(inicio, pasos, n)] = movs
 
     return movs
 
-def totalizar(pasos):
+
+def totalizar(pasos, n):
     total = 0
     for i in range(10):
-        total += calcular(i, pasos)
+        total += calcular(i, pasos, n)
     return total
 
 
-print(totalizar(86))
+n = 500  # Especifica el número de movimientos
+total_movements = totalizar(n, n)
+print(f"Total de movimientos para {n} pasos: {total_movements}")
