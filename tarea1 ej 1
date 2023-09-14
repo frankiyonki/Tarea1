@@ -1,62 +1,31 @@
-class TecladoNumerico:
-    def __init__(self):
-        # Crear una matriz de 4x3 para representar el teclado numérico
-        self.teclado = [[1, 2, 3],
-                        [4, 5, 6],
-                        [7, 8, 9],
-                        [None, 0, None]]  # Usamos None para representar espacios vacíos
-
-    def obtener_numero(self, fila, columna):
-        # Obtener el número en una posición específica del teclado
-        return self.teclado[fila][columna]
-
-    def es_movimiento_valido(self, fila_actual, columna_actual, fila_nueva, columna_nueva):
-        # Verificar si un movimiento desde la posición actual a la nueva es válido
-        if fila_nueva < 0 or fila_nueva >= len(self.teclado) or columna_nueva < 0 or columna_nueva >= len(self.teclado[0]):
-            return False  # Fuera de los límites del teclado
-        numero_actual = self.obtener_numero(fila_actual, columna_actual)
-        numero_nuevo = self.obtener_numero(fila_nueva, columna_nueva)
-        if numero_actual is None or numero_nuevo is None:
-            return False  # Espacio vacío en el teclado
-        # Verificar si el movimiento es válido según las reglas del caballo en el ajedrez
-        dx = abs(columna_nueva - columna_actual)
-        dy = abs(fila_nueva - fila_actual)
-        return (dx == 1 and dy == 2) or (dx == 2 and dy == 1)
+movimientos = {
+    0: [6, 4],
+    1: [6, 8],
+    2: [7, 9],
+    3: [4, 8],
+    4: [3, 9, 0],
+    5: [],
+    6: [1, 7, 0],
+    7: [2, 6],
+    8: [1, 3],
+    9: [2, 4]
+}
 
 
-class MovimientoCaballo:
-    def __init__(self, teclado):
-        self.teclado = teclado
+def calcular(inicio, pasos):
+    movs = 0
+    if pasos:
+        for siguiente in movimientos[inicio]:
+            print(f"{pasos}: {inicio} -> {siguiente}")
+            movs += 1 + calcular(siguiente, pasos - 1)
 
-    def obtener_movimientos_validos(self, fila, columna, n):
-        movimientos_validos = set()
-        self._calcular_movimientos_validos(fila, columna, n, set(), movimientos_validos)
-        return movimientos_validos
+    return movs
 
-    def _calcular_movimientos_validos(self, fila, columna, n, visitados, movimientos_validos):
-        if n == 0:
-            return
-        visitados.add((fila, columna))
-        for df in [-2, -1, 1, 2]:
-            for dc in [-2, -1, 1, 2]:
-                if abs(df) + abs(dc) == 3:
-                    nueva_fila = fila + df
-                    nueva_columna = columna + dc
-                    if self.teclado.es_movimiento_valido(fila, columna, nueva_fila, nueva_columna) and (nueva_fila, nueva_columna) not in visitados:
-                        movimientos_validos.add((nueva_fila, nueva_columna))
-                        self._calcular_movimientos_validos(nueva_fila, nueva_columna, n - 1, visitados.copy(), movimientos_validos)
+def totalizar(pasos):
+    total = 0
+    for i in range(10):
+        total += calcular(i, pasos)
+    return total
 
 
-# Ejemplo de uso
-teclado = TecladoNumerico()
-movimiento_caballo = MovimientoCaballo(teclado)
-movimientos_validos = movimiento_caballo.obtener_movimientos_validos(0,0, 2)
-print(len(movimientos_validos))  # Imprime los movimientos válidos para el caballo desde la posición (1, 1) en 2 movimientos
-
-total_movimientos = 0
-for fila in range(len(teclado.teclado)):
-    for columna in range(len(teclado.teclado[0])):
-        movimientos_validos = movimiento_caballo.obtener_movimientos_validos(fila, columna, 2)  # Cambiar la cantidad de movimientos aquí
-        total_movimientos += len(movimientos_validos)
-
-print("Total de movimientos válidos:", total_movimientos)
+print(totalizar(86))
